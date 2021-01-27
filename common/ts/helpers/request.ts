@@ -1,25 +1,30 @@
 import * as request from "request";
 import * as semver from "semver";
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint from "../sonarqube/Endpoint";
+import Endpoint from "../sonar/Endpoint";
 
-interface RequestData {
+export interface RequestData {
   [x: string]: any;
 }
 
-function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestData): Promise<any> {
-  tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
+export function callGet(
+  endpoint: Endpoint,
+  path: string,
+  isJson: boolean,
+  query?: RequestData
+): Promise<any> {
+  tl.debug(`[SonarScanner] API GET: '${path}' with query '${JSON.stringify(query)}'`);
   return new Promise((resolve, reject) => {
-    const options: request.CoreOptions = {
-      auth: endpoint.auth,
-    };
+    const options: request.CoreOptions = {};
+    if (endpoint.auth && endpoint.auth.user) {
+      options.auth = endpoint.auth;
+    }
     if (query) {
       options.qs = query;
       options.useQuerystring = true;
     }
     request.get(
       {
-        method: "GET",
         baseUrl: endpoint.url,
         uri: path,
         json: isJson,
@@ -27,19 +32,16 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
       },
       (error, response, body) => {
         if (error) {
-          return logAndReject(
-            reject,
-            `[SQ] API GET '${path}' failed, error was: ${JSON.stringify(error)}`
-          );
+          tl.debug(`[SonarScanner] API GET '${path}' failed, error was: ${JSON.stringify(error)}`);
+          return reject(isJson ? {} : "");
         }
         tl.debug(
           `Response: ${response.statusCode} Body: "${isString(body) ? body : JSON.stringify(body)}"`
         );
         if (response.statusCode < 200 || response.statusCode >= 300) {
-          return logAndReject(
-            reject,
-            `[SQ] API GET '${path}' failed, status code was: ${response.statusCode}`
-          );
+          const errorMessage = `[SonarScanner] API GET '${path}' failed, status code was: ${response.statusCode}`;
+          tl.debug(errorMessage);
+          return reject(isJson ? {} : "");
         }
         return resolve(body || (isJson ? {} : ""));
       }
@@ -47,19 +49,14 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
   });
 }
 
-function isString(x) {
+export function isString(x) {
   return Object.prototype.toString.call(x) === "[object String]";
 }
 
 export function getJSON(endpoint: Endpoint, path: string, query?: RequestData): Promise<any> {
-  return get(endpoint, path, true, query);
+  return callGet(endpoint, path, true, query);
 }
 
 export function getServerVersion(endpoint: Endpoint): Promise<semver.SemVer> {
-  return get(endpoint, "/api/server/version", false).then(semver.coerce);
-}
-
-function logAndReject(reject, errMsg) {
-  tl.debug(errMsg);
-  return reject(new Error(errMsg));
+  return callGet(endpoint, "/api/server/version", false).then(semver.coerce);
 }

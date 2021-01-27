@@ -7,17 +7,17 @@ import im = require("azure-pipelines-task-lib/internal");
 import minimatch = require("minimatch");
 
 function _debugMatchOptions(options: tl.MatchOptions): void {
-  tl.debug(`matchOptions.debug: '${options.debug}'`);
-  tl.debug(`matchOptions.nobrace: '${options.nobrace}'`);
-  tl.debug(`matchOptions.noglobstar: '${options.noglobstar}'`);
-  tl.debug(`matchOptions.dot: '${options.dot}'`);
-  tl.debug(`matchOptions.noext: '${options.noext}'`);
-  tl.debug(`matchOptions.nocase: '${options.nocase}'`);
-  tl.debug(`matchOptions.nonull: '${options.nonull}'`);
-  tl.debug(`matchOptions.matchBase: '${options.matchBase}'`);
-  tl.debug(`matchOptions.nocomment: '${options.nocomment}'`);
-  tl.debug(`matchOptions.nonegate: '${options.nonegate}'`);
-  tl.debug(`matchOptions.flipNegate: '${options.flipNegate}'`);
+  tl.debug(`matchOptions.debug: "${options.debug}"`);
+  tl.debug(`matchOptions.nobrace: "${options.nobrace}"`);
+  tl.debug(`matchOptions.noglobstar: "${options.noglobstar}"`);
+  tl.debug(`matchOptions.dot: "${options.dot}"`);
+  tl.debug(`matchOptions.noext: "${options.noext}"`);
+  tl.debug(`matchOptions.nocase: "${options.nocase}"`);
+  tl.debug(`matchOptions.nonull: "${options.nonull}"`);
+  tl.debug(`matchOptions.matchBase: "${options.matchBase}"`);
+  tl.debug(`matchOptions.nocomment: "${options.nocomment}"`);
+  tl.debug(`matchOptions.nonegate: "${options.nonegate}"`);
+  tl.debug(`matchOptions.flipNegate: "${options.flipNegate}"`);
 }
 
 function _getDefaultMatchOptions(): tl.MatchOptions {
@@ -37,9 +37,9 @@ function _getDefaultMatchOptions(): tl.MatchOptions {
 }
 
 function _debugFindOptions(options: tl.FindOptions): void {
-  tl.debug(`findOptions.allowBrokenSymbolicLinks: '${options.allowBrokenSymbolicLinks}'`);
-  tl.debug(`findOptions.followSpecifiedSymbolicLink: '${options.followSpecifiedSymbolicLink}'`);
-  tl.debug(`findOptions.followSymbolicLinks: '${options.followSymbolicLinks}'`);
+  tl.debug(`findOptions.allowBrokenSymbolicLinks: "${options.allowBrokenSymbolicLinks}"`);
+  tl.debug(`findOptions.followSpecifiedSymbolicLink: "${options.followSpecifiedSymbolicLink}"`);
+  tl.debug(`findOptions.followSymbolicLinks: "${options.followSymbolicLinks}"`);
 }
 
 function _getDefaultFindOptions(): tl.FindOptions {
@@ -59,7 +59,7 @@ function _getDefaultFindOptions(): tl.FindOptions {
  * @param  defaultRoot   default path to root unrooted patterns. falls back to System.DefaultWorkingDirectory or process.cwd().
  * @param  patterns      pattern or array of patterns to apply
  * @param  findOptions   defaults to { followSymbolicLinks: true }. following soft links is generally appropriate unless deleting files.
- * @param  matchOptions  defaults to { dot: true, nobrace: true, nocase: process.platform == 'win32' }
+ * @param  matchOptions  defaults to { dot: true, nobrace: true, nocase: process.platform == "win32" }
  */
 export function findMatch(
   defaultRoot: string,
@@ -69,7 +69,7 @@ export function findMatch(
 ): string[] {
   // apply defaults for parameters and trace
   defaultRoot = defaultRoot || tl.getVariable("system.defaultWorkingDirectory") || process.cwd();
-  tl.debug(`defaultRoot: '${defaultRoot}'`);
+  tl.debug(`defaultRoot: "${defaultRoot}"`);
   patterns = patterns || [];
   patterns = typeof patterns == "string" ? ([patterns] as string[]) : patterns;
   findOptions = findOptions || _getDefaultFindOptions();
@@ -83,7 +83,7 @@ export function findMatch(
   let results: { [key: string]: string } = {};
   let originalMatchOptions = matchOptions;
   for (let pattern of patterns || []) {
-    tl.debug(`pattern: '${pattern}'`);
+    tl.debug(`pattern: "${pattern}"`);
 
     // trim and skip empty
     pattern = (pattern || "").trim();
@@ -101,7 +101,7 @@ export function findMatch(
       continue;
     }
 
-    // set nocomment - brace expansion could result in a leading '#'
+    // set nocomment - brace expansion could result in a leading "#"
     matchOptions.nocomment = true;
 
     // determine whether pattern is include or exclude
@@ -111,9 +111,9 @@ export function findMatch(
         negateCount++;
       }
 
-      pattern = pattern.substring(negateCount); // trim leading '!'
+      pattern = pattern.substring(negateCount); // trim leading "!"
       if (negateCount) {
-        tl.debug(`trimmed leading '!'. pattern: '${pattern}'`);
+        tl.debug(`trimmed leading "!". pattern: "${pattern}"`);
       }
     }
 
@@ -122,7 +122,7 @@ export function findMatch(
       (negateCount % 2 == 0 && !matchOptions.flipNegate) ||
       (negateCount % 2 == 1 && matchOptions.flipNegate);
 
-    // set nonegate - brace expansion could result in a leading '!'
+    // set nonegate - brace expansion could result in a leading "!"
     matchOptions.nonegate = true;
     matchOptions.flipNegate = false;
 
@@ -144,7 +144,7 @@ export function findMatch(
 
     for (let pattern of expanded) {
       if (expanded.length != 1 || pattern != preExpanded) {
-        tl.debug(`pattern: '${pattern}'`);
+        tl.debug(`pattern: "${pattern}"`);
       }
 
       // trim and skip empty
@@ -162,7 +162,7 @@ export function findMatch(
           matchOptions
         );
         let findPath: string = findInfo.findPath;
-        tl.debug(`findPath: '${findPath}'`);
+        tl.debug(`findPath: "${findPath}"`);
 
         if (!findPath) {
           tl.debug("skipping empty path");
@@ -170,7 +170,7 @@ export function findMatch(
         }
 
         // perform the find
-        tl.debug(`statOnly: '${findInfo.statOnly}'`);
+        tl.debug(`statOnly: "${findInfo.statOnly}"`);
         let findResults: string[] = [];
         if (findInfo.statOnly) {
           // simply stat the path - all path segments were used to build the path
@@ -193,7 +193,7 @@ export function findMatch(
         // apply the pattern
         tl.debug("applying include pattern");
         if (findInfo.adjustedPattern != pattern) {
-          tl.debug(`adjustedPattern: '${findInfo.adjustedPattern}'`);
+          tl.debug(`adjustedPattern: "${findInfo.adjustedPattern}"`);
           pattern = findInfo.adjustedPattern;
         }
 
@@ -217,7 +217,7 @@ export function findMatch(
         } else {
           // root the exclude pattern
           pattern = im._ensurePatternRooted(defaultRoot, pattern);
-          tl.debug(`after ensurePatternRooted, pattern: '${pattern}'`);
+          tl.debug(`after ensurePatternRooted, pattern: "${pattern}"`);
         }
 
         // apply the pattern
@@ -263,7 +263,7 @@ export function find(findPath: string, options?: tl.FindOptions): string[] {
   findPath = path.normalize(findPath);
 
   // debug trace the parameters
-  tl.debug(`findPath: '${findPath}'`);
+  tl.debug(`findPath: "${findPath}"`);
   options = options || _getDefaultFindOptions();
   _debugFindOptions(options);
 

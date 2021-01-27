@@ -12,8 +12,8 @@ export interface IPropertyBag {
 }
 
 export async function addBuildProperty(properties: IPropertyBag[]) {
-  const collectionUri = tl.getVariable("System.TeamFoundationCollectionUri") + "/";
-  const teamProjectId = tl.getVariable("System.TeamProjectId") + "/";
+  const collectionUri = `${tl.getVariable("System.TeamFoundationCollectionUri")}/`;
+  const teamProjectId = `${tl.getVariable("System.TeamProjectId")}/`;
   const buildId = tl.getVariable("Build.BuildId");
 
   const patchBody: JsonPatchOperation[] = [];
@@ -40,8 +40,7 @@ export async function addBuildProperty(properties: IPropertyBag[]) {
     await buildApi.updateBuildProperties(customHeader, jsonPatchBody, teamProjectId, +buildId);
   } catch (exception) {
     tl.warning(
-      "Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : " +
-        exception
+      `Failed to create a build property. Not blocking unless you are using the Sonar Pre-Deployment gate in Release Pipelines. Exception : ${exception}`
     );
   }
 }

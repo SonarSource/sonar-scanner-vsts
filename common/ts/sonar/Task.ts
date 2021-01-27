@@ -37,7 +37,7 @@ export default class Task {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
     return getJSON(endpoint, `/api/ce/task`, { id: taskId, additionalFields: "warnings" }).then(
       ({ task }: { task: ITask }) => {
-        tl.debug(`[SQ] Task status:` + task.status);
+        tl.debug(`[SonarScanner] Task status:` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();
         }
@@ -45,9 +45,9 @@ export default class Task {
         switch (task.status.toUpperCase()) {
           case "CANCEL":
           case "FAILED":
-            throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
+            throw new Error(`[SonarScanner] Task failed with status ${task.status}${errorInfo}`);
           case "SUCCESS":
-            tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
+            tl.debug(`[SonarScanner] Task complete: ${JSON.stringify(task)}`);
             return new Task(task);
           default:
             return new Promise<Task>((resolve, reject) =>
@@ -64,7 +64,7 @@ export default class Task {
         } else if (err) {
           tl.error(JSON.stringify(err));
         }
-        throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
+        throw new Error(`[SonarScanner] Could not fetch task for ID '${taskId}'`);
       }
     );
   }

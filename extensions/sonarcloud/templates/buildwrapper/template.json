@@ -1,0 +1,243 @@
+{
+  "options": [
+    {
+      "enabled": false,
+      "definition": {
+        "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
+      },
+      "inputs": {
+        "branchFilters": "[\"+refs/heads/*\"]",
+        "additionalFields": "{}"
+      }
+    },
+    {
+      "enabled": false,
+      "definition": {
+        "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
+      },
+      "inputs": {
+        "workItemType": "Bug",
+        "assignToRequestor": "true",
+        "additionalFields": "{}"
+      }
+    }
+  ],
+  "variables": {
+    "system.debug": {
+      "value": "false",
+      "allowOverride": true
+    }
+  },
+  "properties": {},
+  "tags": [],
+  "_links": {
+    "self": {
+      "href": "https://sonarsource.visualstudio.com/399fb241-ecc7-4802-8697-dcdd01fbb832/_apis/build/Definitions/90?revision=1"
+    },
+    "web": {
+      "href": "https://sonarsource.visualstudio.com/399fb241-ecc7-4802-8697-dcdd01fbb832/_build/definition?definitionId=90"
+    },
+    "editor": {
+      "href": "https://sonarsource.visualstudio.com/399fb241-ecc7-4802-8697-dcdd01fbb832/_build/designer?id=90&_a=edit-build-definition"
+    },
+    "badge": {
+      "href": "https://sonarsource.visualstudio.com/399fb241-ecc7-4802-8697-dcdd01fbb832/_apis/build/status/90"
+    }
+  },
+  "jobAuthorizationScope": 1,
+  "jobTimeoutInMinutes": 60,
+  "jobCancelTimeoutInMinutes": 5,
+  "badgeEnabled": true,
+  "process": {
+    "phases": [
+      {
+        "steps": [
+          {
+            "environment": {},
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Prepare analysis on SonarCloud",
+            "timeoutInMinutes": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "14d9cde6-c1da-4d55-aa01-2965cd301255",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "SonarCloud": "4d6d3285-de8e-41bb-a346-987397025edb",
+              "organization": "sonarsource",
+              "scannerMode": "CLI",
+              "configMode": "manual",
+              "configFile": "sonar-project.properties",
+              "cliProjectKey": "my-project-key",
+              "projectKey": "",
+              "cliProjectName": "my-project-name",
+              "projectName": "",
+              "cliProjectVersion": "1.0",
+              "projectVersion": "1.0",
+              "cliSources": "Sample",
+              "extraProperties": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin\nsonar.cfamily.build-wrapper-output=buildWrapperOutputDirectory\nsonar.sourceEncoding=UTF-8"
+            }
+          },
+          {
+            "environment": {},
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Download and expand build wrapper",
+            "timeoutInMinutes": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "e213ff0f-5d5c-4791-802d-52ea3e7be1f1",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "targetType": "inline",
+              "filePath": "",
+              "arguments": "",
+              "script": "# Write your PowerShell commands here.\n\nIf($IsMacOS)\n{\n    Write-Host \"[SonarCloud] Downloading Mac OS build wrapper... \"\n    Invoke-WebRequest -Uri 'https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip' -OutFile 'build-wrapper.zip'\n}\nElseIf($IsLinux)\n{\n    Write-Host \"[SonarCloud] Downloading Linux build wrapper... \"\n    Invoke-WebRequest -Uri 'https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip' -OutFile 'build-wrapper.zip'\n}\nElse\n{\n    Write-Host \"[SonarCloud] Downloading Windows build wrapper... \"\n    Invoke-WebRequest -Uri 'https://sonarcloud.io/static/cpp/build-wrapper-win-x86.zip' -OutFile 'build-wrapper.zip'\n}\n\nWrite-Host \"[SonarCloud]  Expanding build wrapper... \"\nExpand-Archive -Path '$(Agent.TempDirectory)\\build-wrapper.zip' -DestinationPath '$(Agent.TempDirectory)/buildWrapper' -Force\n",
+              "errorActionPreference": "stop",
+              "failOnStderr": "false",
+              "ignoreLASTEXITCODE": "false",
+              "pwsh": "true",
+              "workingDirectory": ""
+            }
+          },
+          {
+            "environment": {},
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Execute build on Windows (Using MSBuild)",
+            "timeoutInMinutes": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "e213ff0f-5d5c-4791-802d-52ea3e7be1f1",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "targetType": "inline",
+              "filePath": "",
+              "arguments": "",
+              "script": "# Write your PowerShell commands here.\n\n& '$(Agent.TempDirectory)\\buildWrapper\\build-wrapper-win-x86\\build-wrapper-win-x86-64.exe' --out-dir buildWrapperOutputDirectory 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\MSBuild\\Current\\Bin\\msbuild.exe' $(Agent.BuildDirectory)\\s\\Sample\\Sample.sln /t:Rebuild",
+              "errorActionPreference": "stop",
+              "failOnStderr": "false",
+              "ignoreLASTEXITCODE": "false",
+              "pwsh": "false",
+              "workingDirectory": ""
+            }
+          },
+          {
+            "environment": {},
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Run Code Analysis",
+            "timeoutInMinutes": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "ce096e50-6155-4de8-8800-4221aaeed4a1",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {}
+          },
+          {
+            "environment": {},
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Publish Quality Gate Result",
+            "timeoutInMinutes": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "38b27399-a642-40af-bb7d-9971f69712e8",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "pollingTimeoutSec": "300"
+            }
+          }
+        ],
+        "name": "Agent job 1",
+        "refName": "Job_1",
+        "condition": "succeeded()",
+        "target": {
+          "executionOptions": {
+            "type": 0
+          },
+          "allowScriptsAuthAccessOption": true,
+          "type": 1
+        },
+        "jobAuthorizationScope": 1
+      }
+    ],
+    "target": {
+      "agentSpecification": {
+        "identifier": "windows-2019"
+      }
+    },
+    "type": 1
+  },
+  "repository": {
+    "properties": {
+      "cleanOptions": "3",
+      "labelSources": "0",
+      "labelSourcesFormat": "$(build.buildNumber)",
+      "reportBuildStatus": "true",
+      "gitLfsSupport": "false",
+      "skipSyncSource": "false",
+      "checkoutNestedSubmodules": "false",
+      "fetchDepth": "0"
+    },
+    "id": "b7d047f0-071c-4dc6-9124-85b07f69b18e",
+    "type": "TfsGit",
+    "name": "sample-cpp-project",
+    "url": "https://sonarsource.visualstudio.com/DotNetTeam%20Project/_git/sample-cpp-project",
+    "defaultBranch": "refs/heads/master",
+    "clean": "true",
+    "checkoutSubmodules": false
+  },
+  "processParameters": {},
+  "quality": 1,
+  "authoredBy": {
+    "displayName": "Mickaël Caro",
+    "url": "https://spsprodweu2.vssps.visualstudio.com/A262a19de-2fe6-40da-a006-aebc39ab61ea/_apis/Identities/986b3b0a-6ea9-6ccc-952b-eeb5ddce40d6",
+    "_links": {
+      "avatar": {
+        "href": "https://sonarsource.visualstudio.com/_apis/GraphProfile/MemberAvatars/aad.OTg2YjNiMGEtNmVhOS03Y2NjLTk1MmItZWViNWRkY2U0MGQ2"
+      }
+    },
+    "id": "986b3b0a-6ea9-6ccc-952b-eeb5ddce40d6",
+    "uniqueName": "mickael.caro@sonarsource.com",
+    "imageUrl": "https://sonarsource.visualstudio.com/_apis/GraphProfile/MemberAvatars/aad.OTg2YjNiMGEtNmVhOS03Y2NjLTk1MmItZWViNWRkY2U0MGQ2",
+    "descriptor": "aad.OTg2YjNiMGEtNmVhOS03Y2NjLTk1MmItZWViNWRkY2U0MGQ2"
+  },
+  "drafts": [],
+  "queue": {
+    "_links": {
+      "self": {
+        "href": "https://sonarsource.visualstudio.com/_apis/build/Queues/38"
+      }
+    },
+    "id": 38,
+    "name": "Azure Pipelines",
+    "url": "https://sonarsource.visualstudio.com/_apis/build/Queues/38",
+    "pool": {
+      "id": 10,
+      "name": "Azure Pipelines",
+      "isHosted": true
+    }
+  },
+  "id": 90,
+  "name": "Sonar CPP - classic build",
+  "type": 2,
+  "queueStatus": 0,
+  "revision": 1,
+  "createdDate": "2019-12-10T10:44:48.453Z",
+}

@@ -26,5 +26,5 @@ export function setIfNotEmpty(props: { [key: string]: string }, key: string, val
 }
 
 export function isWindows() {
-  return tl.osType().match(/^Win/);
+  return tl.getPlatform() === 0;
 }

@@ -1,5 +1,5 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Endpoint, { EndpointType } from "../../../../../common/ts/sonarqube/Endpoint";
+import Endpoint, { EndpointType } from "../../../../../common/ts/sonar/Endpoint";
 import prepareTask from "../../../../../common/ts/prepare-task";
 
 async function run() {

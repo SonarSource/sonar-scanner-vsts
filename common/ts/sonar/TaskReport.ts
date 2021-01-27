@@ -63,7 +63,9 @@ export default class TaskReport {
       taskReportGlobResult = findMatch(tl.getVariable("Agent.TempDirectory"), taskReportGlob);
     }
 
-    tl.debug(`[SQ] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
+    tl.debug(
+      `[SonarScanner] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`
+    );
     return taskReportGlobResult;
   }
 
@@ -77,17 +79,17 @@ export default class TaskReport {
         if (!filePath) {
           return Promise.reject(
             TaskReport.throwInvalidReport(
-              `[SQ] Could not find '${REPORT_TASK_NAME}'.` +
+              `[SonarScanner] Could not find '${REPORT_TASK_NAME}'.` +
                 ` Possible cause: the analysis did not complete successfully.`
             )
           );
         }
-        tl.debug(`[SQ] Read Task report file: ${filePath}`);
+        tl.debug(`[SonarScanner] Read Task report file: ${filePath}`);
         return fs.access(filePath, fs.constants.R_OK).then(
           () => this.parseReportFile(filePath),
           () => {
             return Promise.reject(
-              TaskReport.throwInvalidReport(`[SQ] Task report not found at: ${filePath}`)
+              TaskReport.throwInvalidReport(`[SonarScanner] Task report not found at: ${filePath}`)
             );
           }
         );
@@ -98,10 +100,10 @@ export default class TaskReport {
   private static parseReportFile(filePath: string): Promise<TaskReport> {
     return fs.readFile(filePath, "utf-8").then(
       (fileContent) => {
-        tl.debug(`[SQ] Parse Task report file: ${fileContent}`);
+        tl.debug(`[SonarScanner] Parse Task report file: ${fileContent}`);
         if (!fileContent || fileContent.length <= 0) {
           return Promise.reject(
-            TaskReport.throwInvalidReport(`[SQ] Error reading file: ${fileContent}`)
+            TaskReport.throwInvalidReport(`[SonarScanner] Error reading file: ${fileContent}`)
           );
         }
         try {
@@ -116,9 +118,9 @@ export default class TaskReport {
           return Promise.resolve(taskReport);
         } catch (err) {
           if (err && err.message) {
-            tl.error(`[SQ] Parse Task report error: ${err.message}`);
+            tl.error(`[SonarScanner] Parse Task report error: ${err.message}`);
           } else if (err) {
-            tl.error(`[SQ] Parse Task report error: ${JSON.stringify(err)}`);
+            tl.error(`[SonarScanner] Parse Task report error: ${JSON.stringify(err)}`);
           }
           return Promise.reject(err);
         }
@@ -126,7 +128,7 @@ export default class TaskReport {
       (err) =>
         Promise.reject(
           TaskReport.throwInvalidReport(
-            `[SQ] Error reading file: ${err.message || JSON.stringify(err)}`
+            `[SonarScanner] Error reading file: ${err.message || JSON.stringify(err)}`
           )
         )
     );

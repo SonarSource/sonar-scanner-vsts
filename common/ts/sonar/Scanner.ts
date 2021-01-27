@@ -45,7 +45,7 @@ export default class Scanner {
       case ScannerMode.CLI:
         return ScannerCLI.getScanner(rootPath);
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`[SonarScanner] Unknown scanner mode: ${mode}`);
     }
   }
 
@@ -53,8 +53,8 @@ export default class Scanner {
     switch (mode) {
       case ScannerMode.Other:
         tl.warning(
-          `[SQ] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
-            `'SonarQube' option in the Maven/Gradle task to run the scanner as part of the build.`
+          `[SonarScanner] When using Maven or Gradle, don't use the analyze task but instead tick the ` +
+            `"SonarQube" option in the Maven/Gradle task to run the scanner as part of the build.`
         );
         return Scanner.getScanner(rootPath);
       case ScannerMode.MSBuild:
@@ -62,7 +62,7 @@ export default class Scanner {
       case ScannerMode.CLI:
         return new ScannerCLI(rootPath, {});
       default:
-        throw new Error(`[SQ] Unknown scanner mode: ${mode}`);
+        throw new Error(`[SonarScanner] Unknown scanner mode: ${mode}`);
     }
   }
 

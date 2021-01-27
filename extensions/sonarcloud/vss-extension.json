@@ -192,6 +192,14 @@
       }
     },
     {
+      "id": "21c78153-2e32-4a65-bda5-878550dd8092",
+      "type": "ms.vss-build.template",
+      "targets": ["ms.vss-build.templates"],
+      "properties": {
+        "name": "templates/buildwrapper"
+      }
+    },
+    {
       "id": "b17d1503-2143-4e01-aada-5f8e29759a32",
       "type": "ms.vss-build.template",
       "targets": ["ms.vss-build.templates"],

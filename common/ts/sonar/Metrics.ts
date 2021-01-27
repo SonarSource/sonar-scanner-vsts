@@ -31,7 +31,7 @@ export default class Metrics {
 
   public static getAllMetrics(endpoint: Endpoint): Promise<Metrics | undefined> {
     return inner().catch((err) => {
-      tl.error(`[SQ] Could not fetch metrics`);
+      tl.error(`[SonarScanner] Could not fetch metrics`);
       if (err && err.message) {
         tl.error(err.message);
       } else if (err) {

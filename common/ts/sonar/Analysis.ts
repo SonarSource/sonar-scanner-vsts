@@ -44,7 +44,7 @@ export default class Analysis {
   }
 
   public getHtmlAnalysisReport() {
-    tl.debug(`[SQ] Generate analysis report.'`);
+    tl.debug(`[SonarScanner] Generate analysis report.`);
     return [
       this.getQualityGateSection(),
       this.getQualityGateDetailSection(),
@@ -162,17 +162,17 @@ export default class Analysis {
     metrics?: Metrics;
     warnings: string[];
   }): Promise<Analysis> {
-    tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
+    tl.debug(`[SonarScanner] Retrieve Analysis id "${analysisId}."`);
     return getJSON(endpoint, "/api/qualitygates/project_status", { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
         new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
       (err) => {
         if (err && err.message) {
-          tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
+          tl.error(`[SonarScanner] Error retrieving analysis: ${err.message}`);
         } else if (err) {
-          tl.error(`[SQ] Error retrieving analysis: ${JSON.stringify(err)}`);
+          tl.error(`[SonarScanner] Error retrieving analysis: ${JSON.stringify(err)}`);
         }
-        throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
+        throw new Error(`[SonarScanner] Could not fetch analysis for ID "${analysisId}"`);
       }
     );
   }

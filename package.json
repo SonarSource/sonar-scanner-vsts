@@ -30,18 +30,18 @@
     "gulp-replace": "0.6.1",
     "gulp-typescript": "4.0.2",
     "gulp-util": "3.0.8",
-    "jest": "24.8.0",
-    "jest-when": "2.6.0",
+    "jest": "^24.9.0",
+    "jest-when": "^2.7.0",
     "merge-stream": "2.0.0",
     "prettier": "^2.0.5",
-    "request": "2.85.0",
-    "semver": "5.5.0",
+    "request": "^2.88.0",
+    "semver": "^5.7.1",
     "sonarqube-scanner": "2.5.0",
     "tfx-cli": "0.7.11",
     "tmp": "0.0.33",
-    "ts-jest": "24.0.2",
-    "typescript": "3.5.3",
-    "typescript-eslint-parser": "22.0.0",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.4",
+    "typescript-eslint-parser": "^22.0.0",
     "yargs": "11.0.0"
   },
   "scripts": {
@@ -59,7 +59,7 @@
     "test-build": "./node_modules/.bin/gulp build:test",
     "test": "./node_modules/.bin/jest",
     "test-ci": "./node_modules/.bin/jest --coverage",
-    "ts-check": "./node_modules/.bin/tsc --noEmit",
+    "ts-check": "./node_modules/.bin/tsc --noEmit --skipLibCheck",
     "validate": "npm run lint && npm run ts-check && npm run format-check && npm run test",
     "validate-ci": "npm run lint-report && npm run ts-check && npm run format-check && npm run test-ci"
   },
@@ -81,9 +81,9 @@
       "js"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/node_modules",
-      "<rootDir>/config",
-      "<rootDir>/build"
+      "<rootDir>/node_modules/",
+      "<rootDir>/config/",
+      "<rootDir>/build/"
     ],
     "testRegex": "(/__tests__/.*|\\-test)\\.ts$",
     "testURL": "http://localhost/",

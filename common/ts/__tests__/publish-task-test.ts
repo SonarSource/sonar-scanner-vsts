@@ -1,11 +1,11 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { InvalidApiResourceVersionError } from "azure-devops-node-api/VsoClient";
 import { SemVer } from "semver";
-import Analysis from "../sonarqube/Analysis";
-import Endpoint, { EndpointType } from "../sonarqube/Endpoint";
-import Metrics from "../sonarqube/Metrics";
-import Task, { TimeOutReachedError } from "../sonarqube/Task";
-import TaskReport from "../sonarqube/TaskReport";
+import Analysis from "../sonar/Analysis";
+import Endpoint, { EndpointType } from "../sonar/Endpoint";
+import Metrics from "../sonar/Metrics";
+import Task, { TimeOutReachedError } from "../sonar/Task";
+import TaskReport from "../sonar/TaskReport";
 import * as publishTask from "../publish-task";
 import * as serverUtils from "../helpers/azdo-server-utils";
 import * as apiUtils from "../helpers/azdo-api-utils";
@@ -191,7 +191,7 @@ it("get report string should return undefined if ceTask times out", async () => 
 
   const result = await publishTask.getReportForTask(TASK_REPORT, METRICS, SQ_ENDPOINT, 999);
 
-  expect(result).toBeUndefined();
+  expect(result).toBe("");
   expect(Task.waitForTaskCompletion).toHaveBeenCalledWith(SQ_ENDPOINT, TASK_REPORT.ceTaskId, 999);
   expect(tl.warning).toBeCalledWith(
     "Task '111' takes too long to complete. Stopping after 999s of polling. No quality gate will be displayed on build result."

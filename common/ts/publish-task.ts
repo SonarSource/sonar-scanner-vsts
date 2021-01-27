@@ -1,9 +1,9 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import Analysis from "./sonarqube/Analysis";
-import Endpoint, { EndpointType, EndpointData } from "./sonarqube/Endpoint";
-import Metrics from "./sonarqube/Metrics";
-import Task, { TimeOutReachedError } from "./sonarqube/Task";
-import TaskReport from "./sonarqube/TaskReport";
+import Analysis from "./sonar/Analysis";
+import Endpoint, { EndpointType, EndpointData } from "./sonar/Endpoint";
+import Metrics from "./sonar/Metrics";
+import Task, { TimeOutReachedError } from "./sonar/Task";
+import TaskReport from "./sonar/TaskReport";
 import { publishBuildSummary, fillBuildProperty } from "./helpers/azdo-server-utils";
 import { getServerVersion } from "./helpers/request";
 
@@ -85,4 +85,6 @@ export async function getReportForTask(
       throw e;
     }
   }
+
+  return "";
 }

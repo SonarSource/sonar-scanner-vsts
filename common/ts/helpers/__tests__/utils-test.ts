@@ -1,4 +1,5 @@
-import { setIfNotEmpty, toCleanJSON } from "../utils";
+import * as tl from "azure-pipelines-task-lib/task";
+import { setIfNotEmpty, toCleanJSON, isWindows } from "../utils";
 
 describe("toCleanJSON", () => {
   it("should jsonify", () => {
@@ -18,5 +19,13 @@ describe("setIfNotEmpty", () => {
     expect(test).toEqual({});
     setIfNotEmpty(test, "foo", "bar");
     expect(test).toEqual({ foo: "bar" });
+  });
+});
+
+describe("isOsWindows", () => {
+  it("should return 2", () => {
+    jest.spyOn(tl, "getPlatform").mockReturnValue(2);
+    const actual = isWindows();
+    expect(actual).toEqual(false);
   });
 });
