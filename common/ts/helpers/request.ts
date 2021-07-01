@@ -47,6 +47,39 @@ function get(endpoint: Endpoint, path: string, isJson: boolean, query?: RequestD
   });
 }
 
+export function getNoSonar(baseUrl: string, path: string): Promise<any> {
+  tl.debug(`GET request against ${baseUrl}${path}`);
+  return new Promise((resolve, reject) => {
+    request.get(
+      {
+        method: "GET",
+        baseUrl,
+        uri: path,
+        json: true,
+        headers: { "user-agent": "sonar-azdo-extension" },
+      },
+      (error, response, body) => {
+        if (error) {
+          return logAndReject(
+            reject,
+            `Request to '${path}' failed, error was: ${JSON.stringify(error)}`
+          );
+        }
+        tl.debug(
+          `Response: ${response.statusCode} Body: "${isString(body) ? body : JSON.stringify(body)}"`
+        );
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          return logAndReject(
+            reject,
+            `Request to '${path}' failed, status code was: ${response.statusCode}`
+          );
+        }
+        return resolve(body);
+      }
+    );
+  });
+}
+
 function isString(x) {
   return Object.prototype.toString.call(x) === "[object String]";
 }

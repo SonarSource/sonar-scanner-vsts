@@ -3,8 +3,6 @@ const fs = require('fs-extra');
 const request = require('request');
 const yargs = require('yargs');
 const artifactoryUpload = require('gulp-artifactory-upload');
-const decompress = require('gulp-decompress');
-const download = require('gulp-download');
 const gulp = require('gulp');
 const gulpDel = require('del');
 const gulpRename = require('gulp-rename');
@@ -172,75 +170,6 @@ gulp.task('tasks:version', () => {
     .pipe(gulp.dest(paths.build.extensions.root));
 });
 
-gulp.task('scanner:download', () => {
-  const classicDownload = download(scanner.classicUrl)
-    .pipe(decompress())
-    .pipe(gulp.dest(paths.build.classicScanner));
-
-  const dotnetDownload = download(scanner.dotnetUrl)
-    .pipe(decompress())
-    .pipe(gulp.dest(paths.build.dotnetScanner));
-
-  return mergeStream(classicDownload, dotnetDownload);
-});
-
-gulp.task('scanner:copy', () => {
-  const scannerFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, 'prepare', 'old', 'SonarQubeScannerMsBuild'),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      'prepare',
-      'new',
-      'classic-sonar-scanner-msbuild'
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      'prepare',
-      'new',
-      'classic-sonar-scanner-msbuild'
-    )
-  ];
-
-  const dotnetScannerFolders = [
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      'prepare',
-      'new',
-      'dotnet-sonar-scanner-msbuild'
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      'prepare',
-      'new',
-      'dotnet-sonar-scanner-msbuild'
-    )
-  ];
-
-  const cliFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, 'scanner-cli', 'old', 'sonar-scanner'),
-    path.join(paths.build.extensions.sonarqubeTasks, 'analyze', 'new', 'sonar-scanner'),
-    path.join(paths.build.extensions.sonarcloudTasks, 'analyze', 'new', 'sonar-scanner')
-  ];
-  let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
-  scannerFolders.forEach(dir => {
-    scannerPipe = scannerPipe.pipe(gulp.dest(dir));
-  });
-
-  let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
-  dotnetScannerFolders.forEach(dir => {
-    dotnetScannerPipe = dotnetScannerPipe.pipe(gulp.dest(dir));
-  });
-
-  let cliPipe = gulp.src(
-    pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
-  );
-  cliFolders.forEach(dir => {
-    cliPipe = cliPipe.pipe(gulp.dest(dir));
-  });
-
-  return mergeStream(scannerPipe, dotnetScannerPipe, cliPipe);
-});
-
 gulp.task(
   'copy',
   gulp.series(
@@ -248,9 +177,7 @@ gulp.task(
     'tasks:old:bundle',
     'tasks:new:bundle',
     'tasks:icons',
-    'tasks:version',
-    'scanner:download',
-    'scanner:copy'
+    'tasks:version'
   )
 );
 
