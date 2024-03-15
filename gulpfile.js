@@ -54,27 +54,11 @@ gulp.task("extension:copy", () =>
   ).pipe(gulp.dest(paths.build.extensions.root)),
 );
 
-gulp.task("tasks:old:copy", () =>
-  gulp.src(pathAllFiles(paths.extensions.tasks.old)).pipe(gulp.dest(paths.build.extensions.root)),
-);
-
-gulp.task("tasks:old:common", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.old));
-  globby.sync(paths.extensions.tasks.old, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir))),
-    );
-  });
-  return commonPipe;
-});
-
-gulp.task("tasks:old:bundle", gulp.series("tasks:old:copy", "tasks:old:common"));
-
 gulp.task("npminstall", () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.scv1, "package.json"),
-      path.join(paths.commonv5.new, "package.json"),
+      path.join(paths.commonv5, "package.json"),
     ])
     .pipe(es.mapSync((file) => npmInstallTask(file.path))),
 );
@@ -83,7 +67,7 @@ gulp.task("npminstallv4", () =>
   gulp
     .src([
       path.join(paths.extensions.tasks.v4, "package.json"),
-      path.join(paths.common.new, "package.json"),
+      path.join(paths.common, "package.json"),
     ])
     .pipe(es.mapSync((file) => npmInstallTask(file.path))),
 );
@@ -142,7 +126,7 @@ gulp.task("tasks:v5:ts", () =>
 gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
   let commonPipe = gulp
     .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
+      path.join(paths.commonv5, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
       "!" + path.join("**", "__tests__", "**"),
     ])
@@ -163,7 +147,7 @@ gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
 gulp.task("tasks:sonarqube:v4:common:ts", () => {
   let commonPipe = gulp
     .src([
-      path.join(paths.common.new, "**", "*.ts"),
+      path.join(paths.common, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
       "!" + path.join("**", "__tests__", "**"),
     ])
@@ -184,7 +168,7 @@ gulp.task("tasks:sonarqube:v4:common:ts", () => {
 gulp.task("tasks:v5:commonv5:ts", () => {
   let commonPipe = gulp
     .src([
-      path.join(paths.commonv5.new, "**", "*.ts"),
+      path.join(paths.commonv5, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
       "!" + path.join("**", "__tests__", "**"),
     ])
@@ -230,7 +214,7 @@ gulp.task("tasks:v5:copy", () =>
 );
 
 gulp.task("tasks:v4:common:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.new, "node_modules"));
+  let commonPipe = gulp.src(pathAllFiles(paths.common, "node_modules"));
   globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
       gulp.dest(
@@ -246,7 +230,7 @@ gulp.task("tasks:v4:common:copy", () => {
 });
 
 gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
+  let commonPipe = gulp.src(pathAllFiles(paths.commonv5, "node_modules"));
   globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
       gulp.dest(
@@ -262,7 +246,7 @@ gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
 });
 
 gulp.task("tasks:v5:commonv5:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
+  let commonPipe = gulp.src(pathAllFiles(paths.commonv5, "node_modules"));
   globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
       gulp.dest(
@@ -282,7 +266,7 @@ gulp.task("tasks:cycloneDx:sonarcloud", () =>
     "sonarcloud",
     packageJSON,
     path.join(paths.extensions.root, "sonarcloud"),
-    paths.commonv5.new,
+    paths.commonv5,
   ),
 );
 
@@ -290,8 +274,8 @@ gulp.task("tasks:cycloneDx:sonarqube", () =>
   cycloneDxPipe(
     "sonarqube",
     path.join(paths.extensions.root, "sonarqube"),
-    paths.common.new,
-    paths.commonv5.new,
+    paths.common,
+    paths.commonv5,
   ),
 );
 
@@ -370,7 +354,6 @@ gulp.task("scanner:download", () => {
 gulp.task("scanner:extract-scanners", () => {
   // Extract Windows scanner for MSBuild
   const scannerFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "prepare", "old", "SonarQubeScannerMsBuild"),
     path.join(
       paths.build.extensions.sonarqubeTasks,
       "prepare",
@@ -423,7 +406,6 @@ gulp.task("scanner:extract-scanners", () => {
 
   // Extract CLI scanner to 'analyze' tasks
   const cliFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "scanner-cli", "old", "sonar-scanner"),
     path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v4", "sonar-scanner"),
     path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v5", "sonar-scanner"),
     path.join(paths.build.extensions.sonarcloudTasks, "analyze", "v1", "sonar-scanner"),
@@ -442,7 +424,6 @@ gulp.task(
   "copy",
   gulp.series(
     "extension:copy",
-    "tasks:old:bundle",
     "tasks:sonarcloud:v1:bundle",
     "tasks:v4:bundle",
     "tasks:v5:bundle",
