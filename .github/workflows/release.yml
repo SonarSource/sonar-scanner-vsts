@@ -1,16 +1,23 @@
 name: sonar-release
+
 # This workflow is triggered when publishing a new github release
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - "**"
+  # release:
+  #   types:
+  #     - published
 
 jobs:
   release:
     permissions:
       id-token: write
       contents: write
-    uses: SonarSource/gh-action_release/.github/workflows/main.yaml@3149f397845f87cfc6a9ea769c15f81e71633eef # 5.0.3
+    uses: SonarSource/gh-action_release/.github/workflows/main.yaml@6.0.0
     with:
-      publishToBinaries: true
+      # publishToBinaries: false
+      dryRun: true
       slackChannel: team-sc-azdo-extension-release-notif
+    inputs:
+      version: 1.2.3.123123
