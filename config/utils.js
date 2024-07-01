@@ -52,19 +52,6 @@ function downloadOrCopy(urlOrPath) {
 }
 exports.downloadOrCopy = downloadOrCopy;
 
-function npmInstall(packagePath) {
-  const cwd = process.cwd();
-  run(`cd ${path.dirname(packagePath)} && npm install && cd ${cwd}`);
-}
-exports.npmInstall = npmInstall;
-
-exports.npmInstallTask = function (packagePath) {
-  const packageJson = fs.readJsonSync(packagePath);
-  if (packageJson) {
-    npmInstall(packagePath);
-  }
-};
-
 exports.tfxCommand = function (extensionPath, packageJSON, params = "") {
   const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   run(

@@ -28,18 +28,16 @@ stages:
         steps:
           - task: Npm@1
             displayName: "Update npm"
-            env:
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
             inputs:
               command: "custom"
               customCommand: "i -g npm@latest"
+              customEndpoint: "repox_npm"
 
-          - task: Bash@3
-            displayName: "Install all extension dependencies"
-            env:
-              NPM_CONFIG_//repox.jfrog.io/artifactory/api/npm/:_authToken: $(ARTIFACTORY_PRIVATE_READER_ACCESS_TOKEN)
+          - task: Npm@1
+            displayName: "Install extension dependencies"
             inputs:
-              filePath: "scripts/install.sh"
+              command: "install"
+              customEndpoint: "repox_npm"
 
           - task: Npm@1
             displayName: "Run Validate-CI"

@@ -31,7 +31,7 @@ Make sure that you follow our [code style](https://github.com/SonarSource/sonar-
 
 - Install NPM (v8 or higher) / Node.js (v14 or higher)
 - `npm install -g tfx-cli`
-- `bash scripts/install.sh` (run `scripts/install.ps1` on Windows)
+- `npm i`
 
 ### Package a production build
 

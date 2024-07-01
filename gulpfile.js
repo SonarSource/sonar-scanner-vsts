@@ -56,19 +56,6 @@ gulp.task("clean", () => del([path.join(BUILD_DIR, "**"), path.join(DIST_DIR, "*
 /** BUILD *****************************************************************************************/
 
 /**
- * Run npm install for all common folders
- */
-gulp.task("build:install-dependencies", async () => {
-  const commonFolders = globby.sync(["src/common/*/index.ts"]);
-
-  for (const commonFolder of commonFolders) {
-    const folder = path.dirname(commonFolder);
-    const packageJson = path.join(folder, "package.json");
-    await npmInstallTask(packageJson);
-  }
-});
-
-/**
  * Copy all files needed for the extension
  */
 gulp.task("build:copy-extension", () => {
@@ -323,7 +310,6 @@ gulp.task("extension:patch-test", () => {
 gulp.task(
   "build",
   gulp.series(
-    "build:install-dependencies",
     "build:copy-extension",
     "build:typescript",
     "build:bundle",

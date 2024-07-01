@@ -35,6 +35,11 @@ docker_build_container_template: &CONTAINER_TEMPLATE
   region: eu-central-1
   namespace: default
 
+npmrc_script_definition: &NPMRC_SCRIPT_DEFINITION
+  npmrc_script:
+    - cp .cirrus/npmrc $CIRRUS_WORKING_DIR/.npmrc
+    - find src/common -mindepth 1 -maxdepth 1 -type d -exec sh -c 'cp .cirrus/npmrc "$CIRRUS_WORKING_DIR/$0/.npmrc"' {} \;
+
 #
 # TASKS
 #
@@ -50,11 +55,11 @@ build_task:
     GPG_SIGNING_KEY: VAULT[development/kv/data/sign data.key]
     GPG_SIGNING_PASSPHRASE: VAULT[development/kv/data/sign data.passphrase]
     folder: node_modules
-  install_script:
-    - bash scripts/install.sh
+  <<: *NPMRC_SCRIPT_DEFINITION
   script:
     - git fetch
     - source cirrus-env BUILD
+    - npm install
     - npm run validate-ci
     - npm run build
     - npm run sonarqube
@@ -69,11 +74,11 @@ promote_task:
     cpu: 1
   env:
     ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
+  <<: *NPMRC_SCRIPT_DEFINITION
   node_modules_cache:
     folder: node_modules
-  install_script:
-    - bash scripts/install.sh
   script:
+    - npm install
     - source cirrus-env PROMOTE
     - npm run promote
 
@@ -94,8 +99,9 @@ mend_scan_task:
     # Depth of 1 is not enough because it would fail the build in case of consecutive pushes
     # (example of error: "Hard resetting to c968ecaf7a1942dacecd78480b3751ac74d53c33...Failed to force reset to c968ecaf7a1942dacecd78480b3751ac74d53c33: object not found!")
     CIRRUS_CLONE_DEPTH: 50
+  <<: *NPMRC_SCRIPT_DEFINITION
   mend_script:
-    - bash scripts/install.sh
+    - npm install
     - source cirrus-env BUILD # to set the environment variable BUILD_NUMBER
     - PROJECT_VERSION='NO-VERSION'
     - echo $PROJECT_VERSION
